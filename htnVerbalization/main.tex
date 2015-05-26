@@ -142,8 +142,6 @@ There are several types of hierarchical planners. We are using the widespread HT
 
 A very famous implementation of HTN is SHOP \cite{Nau99}. Our planner will be described in section \ref{planning}.
 
-%TODO GREG: Where to put this  
-%In \cite{Mohseni2015}, the system is able to learn task decomposition from naïve user teaching. They also produce suggestion from object physical property and preconditions and postconditions comparison. This provide an easy way to teach an HTN to a system.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%Plan Monitoring
@@ -592,14 +590,10 @@ This replanning behavior give robustness to the robotic system and allow a socia
 % Just detail here the architecture
 % then make a very partial descritption of the experimentation
 % and give a link to a web page with full experimentation detailed.
-\subsection{Implementation}
+\subsection{Architecture}
 %Miki: Ros node his too much details imo =)
-To implement our solution, we create a ros node call htn-verbalizer. This node is controlled by the supervision system to update the plan to verbalize, and control the start of the plan verbalization.
-
-As specified before, we use HATP planner to generate collaborative plans.
-
-To control all the robotic system we use our supervisor described in previous work...
-% Miki put here the details on the supervisor that were in the old version of Execution and monitoring, but verify that they are relevant :) 
+To implement our solution, we create a module call htn-verbalizer. 
+As all our system modules, it is controlled by the supervision.
 
 \begin{figure}[ht!]
 
@@ -617,60 +611,49 @@ The figure \ref{fig:architecture}
 sums up the architecture and interaction between modules.
 
 
-\subsection{scenario and experimental set-up}
+\subsection{scenario}
 To test our system we created a scenario.
-This scenario consist in a collaborative task where a human and robot has to build a stack of three cubes together. Each cube of the stack will need to be processed before being stacked.
+This scenario consist in a collaborative task where a human and a robot has to build a stack of three cubes together. 
+Each cube of the stack will need to be processed before being stacked.
 %mb put place and needed operation in a table?
 \begin{itemize}
-\item the green cube: it will be placed in bottom and will require polishing.
+\item green cube: it will be placed in bottom and will require polishing.
 \item red cube
 \item blue cube
 \end{itemize}
 % TODO: present the scenario
 We implement in HATP the  domain of the interaction.
 
-We ran our scenario on a pr2 platform.
-To detect the human, we use motion capture device.
-%describe the domain if needed.
-
-
-
-
-% describe the architecture and interactions between modules on technical aspects (ros request ...)
-
-scenario, hatp domain, experimental setup
 
 \subsection{Results}
 \label{results}
-We describe here step by step the different phase of the interaction.
+We describe here the interesting steps of the interaction. To have a complete description and video, visit our page\footnote{mypage}.
 
 \subsection{Plan verbalization}
-When a human arrives in front of the robot, toaster inform the supervisor that a human is in the working area and is looking toward the robot.
+When a human arrives in front of the robot, toaster informs the supervisor that a human is in the working area and is looking toward the robot.
 The supervision will then send a request to the htn-verbalizer to init the interaction with the human. It will also request a plan to HATP.
 
-The supervisor will then require the htn-verbalizer to verbalize the plan generated from HATP %\ref{fig:hatpplan}
-.
+The supervisor will then require the htn-verbalizer to verbalize the plan generated from HATP. %\ref{fig:hatpplan}
 
-We put below the speech output:
-blablabla
-
-We can see that the task blabla was explained only once, as for the 2cd occurrence the human already heard the explanation. Our system was able to dynamically update the human knowledge, allowing it to avoid a double explanation of the same task.
+% Explain how an action is explained only once
+In our scenario, a method has to be done several times by the human. Indeed, the cubes need to be cleaned before being actually processed.
+As our system is able to dynamically update the human knowledge, the robot will explain it only the first time.
 
 \subsection{Verbalization during execution}
-Once the system finished his explanation about the plan, it inform the human that the execution will start.
+Once the system finished his explanation about the plan, it informs the human that the execution will start.
 
-We put below the speech output with the action being performed:
-blabla
-
-At action blabla, the human did balabla. The robot was monitoring the action blabla and notice that the post condition of this action is not reach. A new plan is then requested to HATP.
+%TODO
+At action blabla, the human did balabla. The robot was monitoring the action blabla and notice that the post conditions of this action aren't reached. A new plan is then requested to HATP.
 
 The robot inform the human of his mistake and lower his practical knowledge on the concerned task.
+We show below a part of the verbalization:
+%TODO
 
-Then the robot explain the new plan. In this case, he will have only to explain blabla as the other tasks were already explained in the 1st part of the execution.
+Then the robot explains the new plan. In this case, he will have only to explain blabla as the other tasks were already explained in the 1st part of the execution.
 
 During the execution of the new plan, the robot will proceed as for the previous execution.
 
-
+%TODO: End with metrics: time, number of actions verbalized
 
 %TODO: describe here the interaction, mb with a plan and verbalization output would be good.
 % Explain at least 1 replan situation and one situation where an action is needed twice but explained only once
@@ -685,17 +668,25 @@ During the execution of the new plan, the robot will proceed as for the previous
 
 
 future work:
-In a future paper we would like to conduct a user study enlightening the necessity of  plan verbalization and execution segmentation according to the number of action to verbalize for each agent to ensure scalability of our solution.
-
-\section{Conclusion}
-improvement:
-1) human request explanation: ``why did you do action1?''
-Explaining robot actions \cite{Lomas2012}
+In a future paper we would like to conduct a user study enlightening the necessity of  plan verbalization and execution segmentation according to the number of actions to verbalize for each agent to ensure scalability of our solution.
+We would like also the user to be able to make requests on actions repartition, leading to a plan negociation before the execution.
+In the current study, we consider that the robot knows all the methods and there decomposition. A way to improve this would be to teach the decompositions of tasks to the robot as in\cite{Mohseni2015}.
+%In \cite{Mohseni2015}, the system is able to learn task decomposition from naïve user teaching. They also produce suggestion from object physical property and preconditions and postconditions comparison. This provide an easy way to teach an HTN to a system.
+To improve the interactivity, we should make possible for the human to request explanations on the robot actions as done in\cite{Lomas2012}.
+%Explaining robot actions \cite{Lomas2012}
 %https://www.researchgate.net/publication/254007903_Explaining_robot_actions
 
 %human explaining his choice
 %Telling more than we can know: Verbal reports on mental processes
 %http://people.virginia.edu/~tdw/nisbett&wilson.pdf
+
+
+\section{Conclusion}
+In this paper we show how we were able to explain a plan to a human partner through verbalization.
+Our approach is based on a dynamical tracking of the partner's knowledge state, which allows to 
+fasten the explanation and to avoid repetitions, thus avoiding the robot to be perceived as "annoying" and reducing the time needed to achieve the task.
+This tracking of knowledge also gives the possibility for the robot to choose a plan according to a policy of teaching or efficienty. Finally it also
+gives the possibility for the robot to monitor human on higher lever of actions, giving more flexibility for the human to choose the way to perform a task when he has sufficient knowledge.
 
 
 % ---- Bibliography ----
