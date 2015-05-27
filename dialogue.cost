@@ -1,0 +1,39 @@
+double costFn(number x){
+	return (double)x;
+}
+
+pair<double, double> durationFn(number x1, number x2){
+	return make_pair((double)x1, (double)x2);
+}
+
+// if human works more than robot then cost is 2
+//float computeEffortBalancing(map<LightEntity const*, float> efforts) {
+//	float penH = 0, penR = 0;
+//	for(map<LightEntity const*, float>::const_iterator it=efforts.begin() ; it!=efforts.end() ; it++) {
+//	if ((it->first)->get<string>("type") == "human") penH += it->second;
+//	else penR += it->second;
+//	}
+//	if(penH > penR) return 1.;
+//	return 0.;
+//}
+
+bool isExpert(const LightEntity* Agent){
+	if(Agent->getType()!="Agent"){
+		std::cerr<<"Trying to use isExpert on an Entity not of the Agent type"<<std::endl;
+		return false;
+	}
+	
+	double threshold=75;
+	
+	std::cout<<"Knowledge level : "<<Agent->get<number>("knowledgeLevel")<<std::endl;
+	return(Agent->get<number>("knowledgeLevel") >= threshold);
+}
+
+bool knowsOperation(const LightEntity* Agent, const LightEntity* Cube, const LightEntity* Operation){
+	if(Agent->getType()!="Agent" || Cube->getType()!="Cube" || Operation->getType()!="Operation"){
+		std::cerr<<"Trying to use knowsOperation with the wrong parameters"<<std::endl;
+		return false;
+	}
+	
+	return true;
+}

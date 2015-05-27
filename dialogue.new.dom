@@ -1,0 +1,483 @@
+// Domain to pile up cubes.
+//
+// The domain consists in doing a pile of cubes in a specific area and in a specific order.
+// Two agents can pick and place the cubes.
+// This variant of the stack domain aims at integrating level of knowledge of the human agent.
+// The robot can work with either an expert or a trainee and the solution plan should be adapted.
+//
+// Raphaël Lallement - raphael.lallement@laas.fr  - 05/2015
+//
+// Inspired from stack domain developped by Raphaël Lallement and Sandra Devin
+
+factdatabase{
+	define entityType Operation;
+	define entityType Cube;
+	define entityType Area;
+	define entityType ProcessArea;
+
+	define entityAttributes Agent{
+		static atom number knowledgeLevel;
+
+		dynamic atom Cube holds;
+	}
+
+	define entityAttributes Operation{
+		static atom string type;
+		dynamic atom bool done;
+	}
+
+	define entityAttributes Cube{
+		static atom Cube previous;
+
+		static set Operation firstOperations;
+		static set Operation secondOperations;
+		
+		//TODO IS ON ... to allow repair
+		
+		dynamic set Agent reachableBy;
+		
+		dynamic atom Cube isOn;
+	}
+
+	define entityAttributes Area{
+		dynamic set Cube stack;
+		dynamic atom Cube top;
+	}
+	
+	define entityAttributes ProcessArea{
+		static atom string type;
+		dynamic atom Cube processed;
+		
+		dynamic set Agent reachableBy;
+	}
+
+	Robot = new Agent;
+	Human_1 = new Agent;
+
+	Red_Cube = new Cube;
+	Clean = new Operation;
+	Polish = new Operation;
+
+	Green_Cube = new Cube;
+	Stickers = new Operation;
+	Smoothen = new Operation;
+
+	Blue_Cube = new Cube;
+	Glue = new Operation;
+
+	StackArea = new Area;
+	
+	CleaningArea = new ProcessArea;
+	PolishingArea = new ProcessArea;
+	StickersArea = new ProcessArea;
+	SmoothingArea = new ProcessArea;
+	GluingArea = new ProcessArea;
+	
+	//Definition for all inital state
+	CleaningArea.type = "clean";
+	PolishingArea.type = "polish";
+	StickersArea.type = "stickers";
+	SmoothingArea.type = "smoothen";
+	GluingArea.type = "glue";
+
+	//General definition for the stack: R over G over B
+	Red_Cube.previous = Green_Cube;
+	Clean.type = "clean";
+	Red_Cube.firstOperations <<= Clean;
+	Polish.type = "polish";
+	Red_Cube.secondOperations <<= Polish;
+
+	Green_Cube.previous = Blue_Cube;
+	Stickers.type = "stickers";
+	Green_Cube.firstOperations <<= Stickers;
+	Smoothen.type = "smoothen";
+	Green_Cube.firstOperations <<= Smoothen;
+
+	Blue_Cube.previous = NULL; //Bottom of the pile
+	Glue.type = "glue";
+	Blue_Cube.firstOperations <<= Glue;
+	
+	Robot.knowledgeLevel = 0;
+	Human_1.knowledgeLevel = 30;
+	
+	Red_Cube.reachableBy <<= Robot;
+	Green_Cube.reachableBy <<= Human_1;
+	Blue_Cube.reachableBy <<= Robot;
+	
+	CleaningArea.reachableBy <<= Robot;
+	PolishingArea.reachableBy <<= Robot;
+	StickersArea.reachableBy <<= Human_1;
+	SmoothingArea.reachableBy <<= Human_1;
+	GluingArea.reachableBy <<= Robot;
+}
+
+HTN{
+//Methods to build the stack
+	method BuildStack(Area A){
+		goal{
+			FORALL(Cube C, {}, {C>>A.stack;});
+		};
+		{
+			preconditions{
+				A.stack.size()==0;
+				EXIST(Cube C, {}, {C.previous==NULL;});
+			};
+			subtasks{
+				C=SELECTONCE(Cube, {C.previous==NULL;});
+				R=SELECT(Agent, {R>>C.reachableBy;});
+			
+				1: Handle(R, C, A);
+				2: BuildStack(A) >1;
+			};
+		}
+		{
+			preconditions{
+				A.stack.size()!=0;
+			};
+			subtasks{
+				C=SELECTONCE(Cube, {C.previous==A.top;});
+				R=SELECT(Agent, {R>>C.reachableBy;});
+			
+				1: Handle(R, C, A);
+				2: BuildStack(A) >1;
+			};
+		}
+	}
+
+	method Handle(Agent R, Cube C, Area A){
+		goal{
+			OR{
+				R.holds==NULL;
+				C.previous!=NULL;
+				C.previous>>A.stack;
+				FORALL(Operation Op1, {Op1>>C.firstOperations;}, {Op1.done==true;});
+				FORALL(Operation Op2, {Op2>>C.secondOperations;}, {Op2.done==true;});
+				C>>A.stack;
+				A.top==C;
+			}{
+				R.holds==NULL;
+				C.previous==NULL;
+				FORALL(Operation Op1B, {Op1B>>C.firstOperations;}, {Op1B.done==true;});
+				FORALL(Operation Op2B, {Op2B>>C.secondOperations;}, {Op2B.done==true;});
+				C>>A.stack;
+				A.top==C;
+			}
+		};
+		{
+			preconditions{
+				OR{
+					isExpert(R)==false;
+					
+					C.previous!=NULL;
+					C.previous>>A.stack;
+					C.previous==A.top;
+					R>>C.reachableBy;
+				}{
+					isExpert(R)==false;
+					
+					C.previous==NULL;
+					R>>C.reachableBy;
+					A.stack.size()==0;
+					A.top==NULL;
+				}
+			};
+			subtasks{
+				1: ApplyFirstOperations(R, C);
+				2: ApplySecondOperations(R, C) >1;
+				3: PlaceOnStack(R, C, A) >2;
+			};
+		}
+		{
+			preconditions{
+				OR{
+					isExpert(R)==true;
+					
+					C.previous!=NULL;
+					C.previous>>A.stack;
+					C.previous==A.top;
+					R>>C.reachableBy;
+				}{
+					isExpert(R)==true;
+					
+					C.previous==NULL;
+					R>>C.reachableBy;
+					A.stack.size()==0;
+					A.top==NULL;
+				}
+			};
+			subtasks{
+				1: HandleCube(R, C, A);
+			};
+		}
+	}
+
+	method ApplyFirstOperations(Agent R, Cube C){
+		goal{
+			R.holds==C;
+			FORALL(Operation Op1, {Op1>>C.firstOperations;}, {Op1.done==true;});
+		};
+		{
+			preconditions{
+				R.holds==C;
+			};
+			subtasks{
+				O=SELECT(Operation, {O>>C.firstOperations; O.done==false;});
+
+				1: ApplyOperation(R, C, O);
+				2: ApplyFirstOperations(R, C) >1;
+			};
+		}
+		{
+			preconditions{
+				R.holds==NULL;
+				R>>C.reachableBy;
+			};
+			subtasks{
+				O=SELECT(Operation, {O>>C.firstOperations; O.done==false;});
+
+				1: Pick(R, C);
+				2: ApplyOperation(R, C, O) >1;
+				3: ApplyFirstOperations(R, C) >2;
+			};
+		}
+	}
+
+	method ApplySecondOperations(Agent R, Cube C){
+		goal{
+			R.holds==C;
+			FORALL(Operation Op1, {Op1>>C.firstOperations;}, {Op1.done==true;});
+			FORALL(Operation Op2, {Op2>>C.secondOperations;}, {Op2.done==true;});
+		};
+		{
+			preconditions{
+				R.holds==C;
+				FORALL(Operation Op1, {Op1>>C.firstOperations;}, {Op1.done==true;});
+			};
+			subtasks{
+				O=SELECT(Operation, {O>>C.secondOperations; O.done==false;});
+
+				1: ApplyOperation(R, C, O);
+				2: ApplySecondOperations(R, C) >1;
+			};
+		}
+	}
+
+	method ApplyOperation(Agent R, Cube C, Operation O){
+		goal{
+			OR{
+				R.holds==C;
+				O>>C.firstOperations;
+				O.done==true;
+			}{
+				R.holds==C;
+				O>>C.secondOperations;
+				O.done==true;
+			}
+		};
+		{
+			preconditions{
+				knowsOperation(R, C, O)==false;
+				
+				R.holds==C;
+			};
+			subtasks{
+				P = SELECT(ProcessArea, {P.type==O.type; R>>P.reachableBy;});
+			
+				1: Place(R, C, P); //Superviseur will choose the correct area to place depending on the operation
+				2: Apply(R, C, O) >1;
+				3: Pick(R, C) >2;
+			};
+		}
+		{
+			preconditions{
+				knowsOperation(R, C, O)==true;
+				
+				R.holds==C;
+			};
+			subtasks{
+				P = SELECT(ProcessArea, {P.type==O.type; R>>P.reachableBy;});
+			
+				1: HandleOperation(R, C, O, P);
+			};
+		}
+	}
+	
+	action Pick(Agent R, Cube C){
+		preconditions{
+			R.holds==NULL;
+			R>>C.reachableBy;
+		};
+		effects{
+			R.holds=C;
+			
+			//If the cube is in a ProcessArea, pick it up
+			FORALL(ProcessArea P, {P.processed==C;}, {P.processed=NULL;});
+		};
+		cost{costFn(1)};
+		duration{durationFn(2,6)};
+	}
+	
+	action Apply(Agent R, Cube C, Operation O){
+		preconditions{
+			R.holds==NULL;
+			O.done==false;
+			EXIST(ProcessArea P, {P.processed==C;}, {P.type==O.type; R>>P.reachableBy;});
+		};
+		effects{
+			O.done=true;
+		};
+		cost{costFn(5)};
+		duration{durationFn(2,6)};
+	}
+	
+	action Place(Agent R, Cube C, ProcessArea P){
+		preconditions{
+			R.holds==C;
+			P.processed==NULL;
+			R>>P.reachableBy;
+		};
+		effects{
+			R.holds=NULL;
+			P.processed=C;
+		};
+		cost{costFn(1)};
+		duration{durationFn(2,6)};
+	}
+	
+	action PlaceOnStack(Agent R, Cube C, Area A){
+		preconditions{
+			R.holds==C;
+			A.top==C.previous;
+		};
+		effects{
+			R.holds=NULL;
+			C.isOn=A.top;
+			A.stack<<=C;
+			A.top=C;
+		};
+		cost{costFn(1)};
+		duration{durationFn(2,6)};
+	}
+	
+	action HandleCube(Agent R, Cube C, Area A){
+		preconditions{
+			//For all Operations the agent can reach the corresponding ProcessArea
+			A.top==C.previous;
+		};
+		effects{
+			R.holds=NULL;
+			C.isOn=A.top;
+			FORALL(Operation First, {First>>C.firstOperations;}, {First.done=true;});
+			FORALL(Operation Second, {Second>>C.secondOperations;}, {Second.done=true;});
+			A.stack<<=C;
+			A.top=C;
+		};
+		cost{costFn(1)};
+		duration{durationFn(2,6)};
+	}
+	
+	action HandleOperation(Agent R, Cube C, Operation O, ProcessArea P){
+		preconditions{
+			R.holds==C;
+			O.done==false;
+			O.type==P.type;
+			R>>P.reachableBy;
+			P.processed==NULL;
+		};
+		effects{
+			R.holds=C;
+			O.done=true;
+		};
+		cost{costFn(1)};
+		duration{durationFn(2,6)};
+	}
+	
+	
+	
+	
+	
+	
+	
+//	StackArea.stack <<= Red_Cube;
+//	StackArea.stack <<= Blue_Cube;
+//	StackArea.stack <<= Green_Cube;
+	
+//	StackArea.top=Red_Cube;
+//	Red_Cube.isOn = Blue_Cube;
+//	Blue_Cube.isOn = Green_Cube;
+//	Green_Cube.isOn = NULL;
+
+//	StackArea.top=Blue_Cube;
+//	Blue_Cube.isOn = Red_Cube;
+//	Red_Cube.isOn = Green_Cube;
+//	Green_Cube.isOn = NULL;
+	
+//	StackArea.top=Green_Cube;
+//	Green_Cube.isOn = Red_Cube;
+//	Red_Cube.isOn = Blue_Cube;
+//	Blue_Cube.isOn = NULL;
+	
+//	StackArea.top=Red_Cube;
+//	Red_Cube.isOn = Green_Cube;
+//	Green_Cube.isOn = Blue_Cube;
+//	Blue_Cube.isOn = NULL;
+	
+//Methods to repair a stack
+//	method ControlStrack(Area A){
+//		goal{
+//			FORALL(Cube C, {C>>A.stack;}, {C.isOn==C.previous;});
+//		};
+//		{
+//			preconditions{};
+//			subtasks{
+//				First=SELECT(Cube, {});//{First>>A.stack;First.isOn==NULL;});
+//				
+//				1: Check(First, A);
+//				//TODO Decide what to do after finding the incorrect ones
+//			};
+//		}
+//	}
+
+//	method Check(Cube Current, Area A){
+//		goal{
+//			A.top==Current;
+//			FORALL(Cube Other, {Other!=Current;}, {Other.isOn!=Current;});
+//		};
+//		{
+//			preconditions{
+//				Current.isOn!=Current.previous;
+//				EXIST(Cube Next, {Next>>A.stack;}, {Next.isOn==Current;});
+//			};
+//			subtasks{
+//				Next=SELECT(Cube, {Next>>A.stack;Next.isOn==Current;});
+//				R=SELECTONCE(Agent, {});
+
+//				1: NotifyAsWrong(R, Current);
+//				2: Check(Next, A) >1;
+//			};
+//		}
+//		{
+//			preconditions{
+//				Current.isOn==Current.previous;
+//				EXIST(Cube Next, {Next>>A.stack;}, {Next.isOn==Current;});
+//			};
+//			subtasks{
+//				Next=SELECT(Cube, {Next>>A.stack;Next.isOn==Current;});
+
+//				1: Check(Next, A);
+//			};
+//		}
+//		//TODO HANDLE THE TOP OF THE STACK
+//	}
+
+//	action NotifyAsWrong(Agent R, Cube C){
+//		preconditions{
+//			C.isOn!=C.previous;
+//		};
+//		effects{
+//			
+//		};
+//		cost{costFn(1)};
+//		duration{durationFn(1,1)};
+//	}
+}
