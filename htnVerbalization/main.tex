@@ -9,6 +9,7 @@
 \documentclass{llncs}
 \usepackage{graphicx}
 \usepackage[]{algorithm2e}
+\usepackage[]{program}
 
 \begin{document}
 \title{\LARGE \bf
@@ -27,10 +28,10 @@ Michelangelo Fiore\inst{1} \and Rachid Alami\inst{1}}
 %%%% list of authors for the TOC (use if author list has to be modified)
 \tocauthor{Gr\'egoire Milliez, Rapha\"el Lallement, Michelangelo Fiore, Rachid Alami}
 %
-\institute{Universit\'e de Toulouse, LAAS-CNRS institut Carnot,
-        7 rue du Colonel Roche, 31500, France,\\
-\email{firstname.surname@laas.fr},\\ home page:
-\texttt{www.laas.fr}
+\institute{CNRS, LAAS, 7 avenue du colonel Roche, F-31077 Toulouse, France
+    / Universit{\'e} de Toulouse, UPS, INSA, INP, ISAE, LAAS,
+    F-31077 Toulouse, France\\
+\email{firstname.surname@laas.fr}
 }
 
 
@@ -39,8 +40,8 @@ Michelangelo Fiore\inst{1} \and Rachid Alami\inst{1}}
 \begin{abstract}
 Robots are made to assist humans on daily basis tasks, either in households or at working places. In some situations, the task may require a collaborative plan computation and execution.
 To achieve a collaborative plan, each agent need to be aware of their own task and how to perform them. This paper aims to address the issue of enhancing a robotic system with appropriate plan verbalization based on its dynamically updated collaborator's knowledge model.
- We will also explain how we can tune our shared plan generation to optimize it according to the user's knowledge level on each task, and how we use the tree configuration of our Hierarchical Task Network (HTN) plan to enhance the robotic system with an appropriate monitoring according to the partner's knowledge level on the current task.\dots
-\keywords{HRI, HTN, perspective taking, speech generation}
+ We will also explain how we can tune our shared plan generation to optimize it according to the user's knowledge level on each task, and how we use the tree configuration of our Hierarchical Task Network (HTN) plan to enhance the robotic system with an appropriate monitoring according to the partner's knowledge level on the current task.
+%\keywords{HRI, HTN, perspective taking, speech generation}
 \end{abstract}
 %
 
@@ -56,10 +57,9 @@ A collaborative plan, or shared plan, is a set of actions involving several agen
 %Some actions of the plan may be executed in parallel, sequentially or jointly (several agents acting together) and may require synchronization to ensure proper plan execution.
 %
 
-Once the robot has generated a collaborative plan to achieve the common goal, this plan needs to be shared with the human partners in order to insure that they are aware of the actions they have to perform and have the requested level of knowledge to perform their task. When dealing with simple plans, infants can cooperate without using language if the plan and goal are simple enough. In situations requiring more complex plans, language is the preferred method \cite{Warneken2006,Warneken2007}. However, we believe that verbalizing the whole plan would be inefficient and 
+Once the robot has generated a collaborative plan to achieve the common goal, this plan needs to be shared with the human partner in order to insure that he is aware of the tasks he has to perform and has the requested level of knowledge to execut them. When dealing with simple plans, infants can cooperate without using language if the plan and goal are simple enough. In situations requiring more complex plans, language is the preferred method \cite{Warneken2006,Warneken2007}. However, verbalizing the whole plan would be inefficient and 
 annoying for the human partner, specially when he is already aware of the way to achieve part of it.  
 %%Miki: meta-tasks seems to be to specific at this level imo 
-
 
 Research in psychology and philosophy lead to have a closer understanding on human behavior during joint actions and collaboration, to understand how \cite{tomasello2005} and why \cite{tomasello2009} we collaborate and what is shared \cite{Butterfill2011}.
 
@@ -67,7 +67,7 @@ These research on joint actions were used in robotic platforms to perform tasks 
 %since I do not want to go over your part :P
 %TODO RAPH: cite paper on collaborative plan generation
  few actually study how to share the plan in a socially acceptable way.
-In this paper we will expose our way to solve this issue. We will first explain how we track human's knowledge, then how we are able to generate an HTN collaborative plan with a policy on human knowledge level on the plan's tasks. To finish, we will explain how we use the tree structure of the HTN  plan generated to verbalize the shared plan according to the user knowledge level, and during the execution phase to guide the human and to have an adaptive monitoring of his actions. 
+The main motivation of this paper is to expose our way to solve this issue. We will first explain how we track human's knowledge, then how we are able to generate an HTN collaborative plan with a policy on human knowledge level on the plan's tasks. To finish, we will explain how we use the tree structure of the HTN  plan generated to verbalize the shared plan\footnote{We won't discuss the issue of negotiating a plan between the involved collaborators. The human will have to follow the plan generated by the robot considered here as an expert for the tasks to perform} according to the user knowledge level, and during the execution phase to guide the human and to have an adaptive monitoring of his actions. 
 %% I think you can cut something here. Seems like we're applying the verbalization algorithm to our paper XD
 
 
@@ -89,7 +89,7 @@ In this paper we will expose our way to solve this issue. We will first explain 
 
 
 %shrink?
-Previous studies show the value of using a joint plan, such as \cite{Lallee2013}. In this same article, author also lead experiments on na\"ive subjects and suggest that the joint plan should be fully communicated in order to sustain effective collaboration. In \cite{Petit2012}, dialogue is used to teach new plans to the robot and to modify these plans. One of the three ways for the robot to learn is through ``spoken language programming'' where the human verbally explains the task to the robot. In our situation the robot is the one that may have to explain the task. Furthermore, using hierarchical plan allows us to adapt the level of explanation to the knowledge level of the collaborator.
+Previous studies show the value of using a joint plan, such as \cite{Lallee2013}. In this same article, author also lead experiments on na\"ive subjects and suggest that the joint plan should be fully communicated in order to sustain effective collaboration. In \cite{Petit2012}, dialogue is used to teach new plans to the robot and to modify these plans. One of the ways for the robot to learn is through ``spoken language programming'' where the human verbally explains the task to the robot. However it doesn't study the situation where the robot may have to explain the task. Furthermore, using hierarchical plan allows us to adapt the level of explanation to the knowledge level of the collaborator.
 %\cite{Lallee2013} show that cooperation capability is significantly enhanced when the robot has a joint plan which allows it to guide the successive turn taking in achieving the execution. They also lead experiments on na\"ive subjects and suggest that the joint plan should be fully communicated in order to sustain effective collaboration. We argue that one way to improve the interaction with any kind of subject is by reasoning on human knowledge on tasks involved in the joint plan.
 
 %\cite{Brenner2008} presents Continual Collaborative Planning (CCP), a framework for behavior planning, physical action and perception. They show how mixed-initiative dialogue that interleaves physical  actions,  sensing,  and  communication  between agents occurs naturally during CCP.
@@ -105,17 +105,16 @@ Previous studies show the value of using a joint plan, such as \cite{Lallee2013}
 
 %Remove?
 %In this paper, we choose to use the other agents' knowledge to adapt the plan verbalization.
-Reasoning on others' mental state is a skill called Theory of Mind \cite{premack1978does}. An ability linked to this concept is perspective taking, which is widely studied in developmental literature. 
+Reasoning on others' mental state is a skill called Theory of Mind \cite{premack1978does}. An ability linked to this concept is perspective taking, which is widely studied in developmental literature \cite{Tversky1999,Baron1985}. 
 %This broad term encompasses 1) perceptual perspective taking, whereby humans can understand that other people see the world differently~\cite{Tversky1999}, and 2) conceptual perspective taking, whereby humans can go further and attribute thoughts and feelings to other people~\cite{Baron1985}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % perspect t. in robotics
-
 % In robotic, show how it is used to improve different things:
 % planning, dialogue, intention recognition...
 The perspective taking ability has been successfully used in several robotic fields, improving robots' reasoning capabilities, leading to more appropriate and efficient task planning and interaction strategies.
 Among others, ~\cite{breazeal2006} presents a learning algorithm that takes into account information about a teacher's visual perspective in order to learn tasks.
-Some studies also use conceptual perspective taking to manage agents' belief state and deal with divergent belief situations. Formulated in~\cite{wimmer1983}, this kind of task requires the ability to recognize that others can have beliefs about the world that differ from the observable reality.
-In our previous work, we show how reasoning on others' mental state is a key feature for planning \cite{guitton2012}, understanding properly others' intentions \cite{fiore2015}, and improving dialogue \cite{Ferreira2015}. While these research focused on robot representation of other agents' belief state concerning the environment, here we will maintain and use a model of the human knowledge on the collaborative plan to perform.
+%Some studies also use conceptual perspective taking to manage agents' belief state and deal with divergent belief situations. Formulated in~\cite{wimmer1983}, this kind of task requires the ability to recognize that others can have beliefs about the world that differ from the observable reality.
+In our previous work, we show how reasoning on others' mental state is a key feature for planning \cite{guitton2012}, understanding others' intentions \cite{fiore2015}, and improving dialogue \cite{Ferreira2015}. While these research focused on robot representation of other agents' belief state concerning the environment, we will here maintain and use a model of the human knowledge on the collaborative plan to perform.
 
 
 %TODO: where to put this? => don't put it!
@@ -172,52 +171,56 @@ In \cite{clairrobot} dialogue is used during collaborative plan execution in ord
 
 
 \section{Knowledge Tracking}
-Reasoning on agents' knowledge requires to manage a mental state for each agent involved in the interaction.
-In this context, as the robot will generate the shared plan, we will suppose that it knows all the actions included in the plan.
+%Reasoning on agents' knowledge requires to manage a mental state for each agent involved in the interaction.
+%In this context, as the robot will generate the shared plan, we will suppose that it knows all the actions included in the plan.
 
 % => Greg
 % (toaster)
-\subsection{Situation Assessment}
-To assess the mental state of its collaborator, the robot needs to understand the situation and extract information about agents' beliefs and knowledge.
-To do so, we use the toaster framework (Tracking Of Agents and Spatio-TEmporal Reasoning). Toaster is a modular framework meant to fill the gap between perception and decision layers. It uses data about humans, robots and objects to asses the situation and to maintain a consistent world state. It also computes affordances for each agent (reachability and visibility).
-We won't detail here any further this component concerning the situation assessment.
-For more details see our previous work with SPARK \cite{Milliez2014}.
-
-\subsection{Mental States}
+\subsection{Situation Assessment and Mental States}
+To assess the knowledge state of its collaborator, the robot needs to understand the situation and extract information about agents.
+To do so, we use the TOASTER framework (Tracking Of Agents and Spatio-TEmporal Reasoning). It is a modular framework meant to fill the gap between perception and decision. It uses data about humans, robots and objects to asses the situation and maintain a consistent world state. 
+%remove?
+%It also computes affordances for each agent (reachability and visibility).
+Further details can be found in our previous work \cite{Milliez2014}.
+%
+%\subsection{Mental States}
 % present our way of maintaining belief state
 Using situation assessment, we were able in previous works to manage a belief state for each agent, robots and humans. Each belief state model is independent and logically consistent. The models are the way the robot represents its counterparts' mental states about the environment.
 
-In this paper we won't consider beliefs on environment but the human's knowledge on actions. This knowledge will be represented as a set of 4 variables, consisting in the human it is linked to, the kind of task, a list of parameter and the value (or level) of knowledge:
+%%OLD
+%In this paper we won't consider beliefs on environment but the human's knowledge on actions. This knowledge is represented as a set of 4 variables; the human it is linked to, the task, a list of parameters and the value (or level) of knowledge: HUMAN ACTION PARAMETERS VALUE.
+%
+%%NEW
+In this paper we won't consider beliefs on environment but the human's knowledge on tasks. This knowledge is represented as: 
 
-HUMAN ACTION PARAMETERS VALUE
+HUMAN TASK PARAMETERS VALUE. 
 
-As an example, the fact that the \textit{human1} has a "practical" knowledge on cooking an apple-pie would be represented as:
-
-human1 cook applePie practical
-
-The different possible values are \textit{unknown}, \textit{theoretical} and \textit{practical}. We will explain these values in the next part.
+HUMAN is the human it is linked to, TASK is the name of the task, PARAMETERS is the list of parameters and VALUE is the value (or level) of knowledge.
+%
+As an example, the fact that the \textit{human1} has a "practical" knowledge on cooking an apple-pie would be represented as: \textit{human1 cook applePie practical}
+The possible knowledge values are \textit{unknown}, \textit{theoretical} and \textit{practical}. We will explain these values in the next part.
 
 %%TODO: check if this is clear?
 %% NEW
-For some actions, the knowledge may be linked to a "class" of parameters instead of the instance of this class.
-As an example, we can consider that if a human knows how to paint the living-room, he will know how to paint any room. In this case we will put in his knowledge the class "room" for the action of painting instead of the instance living-room.
+For some tasks, the knowledge may be linked to a "type" of parameters instead of the instance of this class.
+As an example, we can consider that if a human knows how to paint the living-room, he will know how to paint any room. In this case we will put in his knowledge the type "room" for the action of painting instead of the instance living-room.
 %%END NEW
-
+%
 %%OLD
 %Let's consider a scenario where two agents have to process colored cubes and stack them.
 %The action \textit{process} may differ depending on which cube we are processing: we may want to paint the red cube and to polish the green cube. 
-
+%
 %In this case we will represent this knowledge as follow:
-
+%
 %HUMAN process greenCube VALUE
-
+%
 %For other actions, the knowledge will be specific to a class. As an example if a human knows how to polish the green cube, we consider that he will know how to polish any cube.
-
+%
 %In that case, we will represent this knowledge as follow:
-
+%
 %AGENT polish cubes VALUE
 %%END OLD
-
+%
 %TODO RAPH:
 %check if we can do this in a better way
 In the current implementation, the fact that an action is specific to an instance of the parameter or generalized to a class of parameter is handcrafted.
@@ -229,46 +232,51 @@ In the current implementation, the fact that an action is specific to an instanc
 \subsection{Updating Knowledge}
 
 %How human update their knowledge
-There are several ways for humans to modify their state of knowledge. To track human mental state we need to identify these ways.
+In this context, as the robot generates the shared plan, we suppose that it knows all the tasks in the plan.
+Concerning humans, there are several ways to modify their knowledge. To track their knowledge state we need to identify these ways.
 
-%1) Someone explain
-The first way for a human to acquire knowledge is to get explanations from a third party. In our system, when a human is informed of how to perform an action, we will change the value of his knowledge from \textit{unknown} to \textit{theoretical} to represent that he has been told of what to do when we ask him to perform this task.
-
-%2) Someone did task in front of agent
-% Human can learn to do something by seeing somebody else doing it.
+%%1) Someone explain
+The first way for a human to acquire knowledge is to get explanations from a third party. In our system, when a human is informed (here by the robot) of how to perform an action, we will change the value of his knowledge from \textit{unknown} to \textit{theoretical} to represent that he has been told of what to do.
 %
-%TODO: check redondant with Michelangelo on role reversal
-Another way for humans to learn is through observation and imitation of a third party achieving the action. Studies in developmental psychology show evidence that role reversal imitation ability is present in developing infants \cite{carpenter2005}.
-In our system, when a human will observe someone else perform an action, we will set his knowledge value of this action from \textit{theoretical} to \textit{practical}. In this setting we will consider that, if a human observes an action being performed without actually being instructed of the action, he won't be able to link it to the corresponding action. So if a human with a knowledge value set to \textit{unknown} observes this action being performed, we won't update his knowledge value and consider that he still needs explanation.
+%%2) Someone did task in front of agent
+%% Human can learn to do something by seeing somebody else doing it.
+%
+%%TODO: check redondant with Michelangelo on role reversal
+Another way for humans to learn is through observation and imitation of a third party achieving the task \cite{carpenter2005}. 
+%Studies in developmental psychology show evidence that role reversal imitation ability is present in developing infants \cite{carpenter2005}.
+In our system, when a human observe someone else performing a task, we will set his knowledge value for this task to \textit{practical} if he has \textit{theoretical} knowledge of the task. However, we won't update it if the task is \textit{unknown} as we consider that he won't be able to link his observation to the corresponding action. 
+%
+%So if a human with a knowledge value set to \textit{unknown} observes this action being performed, we won't update his knowledge value and consider that he still needs explanation.
+%
 %The current research thus exploits a series of developments that have resulted in the ability of the robot to learn a joint plan, to use that joint plan in cooperation with a human, and to demonstrate role reversal  [6-8].  Again, in role reversal, the cognitive agent is able to use the same joint plan, but exchange roles with the other partner.  This ability has been recognized by developmental psychologists as evidence that the agent has “bird’s eye view” knowledge of the joint plan, rather than a purely ego-centric view  [17].
-
+%
 %https://www.researchgate.net/publication/260662746_The_Coordinating_Role_of_Language_in_Real-Time_Multimodal_Learning_of_Cooperative_Tasks
-
+%
 %In role reversal, the cognitive agent is able to use the same joint plan, but exchange roles with the other partner. This ability has been recognized by developmental psychologists as evidence that the agent has “bird’s eye view” knowledge of the joint plan, rather than a purely ego-centric view  [17].
-
+%
 %M. Carpenter, M. Tomasello, and T. Striano, ``Role reversal imitation and language in typically developing infants and children with autism,'' Infancy, vol. 8, pp. 253-278, 2005.
-
-
-
-%3) Agent did the task
-
+%
+%
+%
+%%3) Agent did the task
+%
 %The observations made possible via both exploratory and performatory actions  provide the material for his knowledge of the world
 %http://wexler.free.fr/library/files/gibson%20%281988%29%20exploratory%20behavior%20in%20the%20development%20of%20perceiving,%20acting,%20and%20the%20acquiring%20of%20knowledge.pdf
-
+%
 The last knowledge state transition we will consider is when the human actually succeeds to perform the task. When a human performs a new task, we will change his knowledge state to \textit{practical}.
 
+%%Mb put this directly when explaining execution?
+%%4) Agent failed to do the task
+%% TODO: verify that the supervisor can get the failures
+%It may happen during the execution that a human fails to perform a task.
+%We will then reduce his knowledge on this task to \textit{theoretical} if it's the first failure and to \textit{unknown} if he fails several times to achieve the action.
 
-%4) Agent failed to do the task
-% TODO: verify that the supervisor can get the failures
-It may happen during the execution that a human fails to perform a task.
-We will then reduce his knowledge on this task to \textit{theoretical} if it's the first failure and to \textit{unknown} if he fails several times to achieve the action.
+%%5) Agent require explanation
+%%TODO: do we keep this?
+%It may also happen that a human directly asks for information on a task.
+%If the human asks what to do, we will lower his task knowledge level to \textit{unknown}. If he asks how to do the task, we will only lower his task knowledge level to \textit{theoretical}.
 
-%5) Agent require explanation
-%TODO: do we keep this?
-It may also happen that a human directly asks for information on a task.
-If the human asks what to do, we will lower his task knowledge level to \textit{unknown}. If he asks how to do the task, we will only lower his task knowledge level to \textit{theoretical}.
-
-These different levels of knowledge will be used during the two verbalization steps. If an action is unknown to a human, we will explain it to him before starting the execution. If he has only theoretical knowledge of the action, we will explain him again during the execution and monitor each step of this action execution. More details will be given in \ref{planVerbalization} and \ref{execution}
+These different levels of knowledge will be used during the two verbalization steps. If a task is \textit{unknown} for a human, we will explain it to him before starting the execution, to ensure that he has at least \textit{theoretical} knowledge. If he has only \textit{theoretical} knowledge of the task, we will guide him, through speech, during the execution and monitor each step of this task execution. More details will be given in Sect.\ref{planVerbalization} and Sect.\ref{execution}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % end knowledge
@@ -287,8 +295,8 @@ These different levels of knowledge will be used during the two verbalization st
 
 % GREG proposition:
 
-Among famous robotic planners, STRIPS \cite{strips71} is used to build plans that are sequences of actions. We decide in this paper to use plan with hierarchy instead as it offers a better understanding of the context in which an agent is asked to carry out an action. This context is beneficial for dialogue, as the system can guide users in a more appropriate way, by explaining why he should perform an action and how it is linked to previous and successive part of the plan. 
-We are using the widespread HTN because its domain representation and its algorithm are easy to understand, which makes it a good robotics tool, while still being very efficient. 
+In robotics, lots of planners are used for diverse tasks. Among famous robotic planners, STRIPS \cite{strips71} is used to build plans that are sequences of actions. We decide here to use instead a plan with hierarchy as it offers a better understanding of the context in which an agent is asked to carry out an action. This context is beneficial for dialogue, as the system can guide users by explaining why he should perform an action and how it is linked to previous and successive part of the plan. 
+We are using the HTN because its domain representation and its algorithm are easy to understand, while still being very efficient. 
 %It is way more efficient than classical planning since the domain expert can guide the search process toward the goal by providing a correct representation. 
 
 %A very famous implementation of HTN is SHOP \cite{Nau99}. Our planner will be described in section \ref{planning}.
@@ -297,15 +305,13 @@ We are using the widespread HTN because its domain representation and its algori
 
 %HATP
 To compute collaborative plans, we use HATP \cite{lallement14} an HTN planner specifically designed for robotics.
-HATP comes along with specific features concerning plan generation, such as: (1) agent based to allow multi-agent plans, (2) cost driven to allow plan pruning and (3) social rules to refine plan according to the most suited social behavior.
-
-HATP is able to create plans with several streams, one per agent. The stream-plan produced can have parallel actions, sequential actions, or joint actions. 
-%%TODO: do we need this level of details?
-Since it is cost-driven the number of plan to compute is reduced: to find the very best plan (in term of cost and properties it holds). 
+HATP comes along with specific features concerning plan generation, such as: (1) agent based for multi-agent plans, (2) cost driven for plan pruning and (3) social rules to refine plan according to the most suited social behavior.
+Since it is cost-driven the number of plan to compute is reduced: to find the best plan (in term of cost and properties it holds). 
 %if the current best plan is better than the current plan (even if incomplete) then the current plan is discarded and a new plan is tried. This mechanism reduces the number of plans to compute to obtain the best plan. 
 This best plan is defined by its cost (the sum of every action's cost in the plan) but also by a set of social properties (e.g. how the workload is shared).
 
-To take knowledge in account while planning a new social rule was needed. The aim is to filter plans out if they do not match our knowledge policy. We propose two different policies: favor teaching so the human can learn from the robot or prefer efficiency. In the first case the planner tries to produce plans maximizing the number of human actions where the human must learn, while the second policy makes the planner chooses plans with the least amount of unknown actions for the human in order to ensure that he can be more efficient (the robot however can execute some actions unknown to the human).
+To take knowledge in account while planning, a new social rule was needed. The aim is to select the plan that is best suited for the given policy. We propose two different policies: favor teaching so the human can learn from the robot or prefer efficiency. In the first case the planner tries to produce plans maximizing the number of human tasks where the human must learn, while the second policy makes the planner chooses plans with the least amount of unknown tasks for the human in order to ensure that he can be more efficient.
+%(the robot however can execute some tasks unknown to the human).
 In case of a policy to favor teaching, the principle of the rule is simply to apply a penalty every time the human has to perform an action he already knows. This penalty would be reversed for the opposite rule.
 
 %%TODO, make it more clear!
@@ -313,7 +319,7 @@ In case of a policy to favor teaching, the principle of the rule is simply to ap
 %%+ replace learning by teaching!
 %the principle of the rule is simply to apply a penalty every time the human has to perform an action he already knows (resp. he has to learn) so the solution plan chosen among all possible plan will contains the minimum number of known actions (resp. actions to learn) hence be more in favor of learning (resp. efficiency). The responsibility to decide between favoring learning or efficiency is then left to the domain expert (e.g. the company owner).
 
-To illustrate this mechanism we can imagine a toy example where we want to clean a cube. There are two ways of doing it: using a rag or using water. We have two agents, a human and a robot, and they are both able to perform each step. However the human only knows how to clean with water. If we favor teaching then HATP will choose a plan where the human has to clean the cube using the rag (the robot will assist by providing dialogue guidance). On the other hand if we prefer efficiency there are two solutions : either the robot does the operation or the human uses water to clean the cube. 
+To illustrate this mechanism we can imagine a toy example where we want to clean a cube. There are two ways of doing it: using a rag or using water. We have two agents, a human and a robot, and they are both able to perform each step. However the human only knows how to clean with water. If we favor teaching then HATP will choose a plan where the human has to clean the cube using the rag (the robot will assist by providing dialogue guidance). On the other hand if we prefer efficiency HATP will select a plan where either the robot does the operation or the human uses water to clean the cube. 
 %comment: je trouve que cette dernière phrase embrouille plus qu'autre chose soit reformuler, soit enlever
 %To choose between those last possibilities only the relative cost (e.g. of the motions) will determine which will be the solution used.
 
@@ -326,14 +332,16 @@ To illustrate this mechanism we can imagine a toy example where we want to clean
 %htn_verbalizer => Greg
 
 % intro
-Once the robotic system has generated a collaborative plan adapted to the chosen HATP policy, the plan must be shared with the human partners.
-Speech is a ``potent modality for the on-going maintenance of cooperative interaction'' \cite{Lallee2013}. Indeed, Tomasello even suggest that the principal function of language is to establish and negotiate cooperative plans \cite{tomasello2005}.
-Considering this, we decide to use speech to verbalize the shared plan. We propose here a way to take advantage of the HTN collaborative plan structure to enhance an efficient plan verbalization.
+%Once the robotic system has generated a collaborative plan adapted to the chosen HATP policy, the plan must be shared with the human partners.
+%Speech is a ``potent modality for the on-going maintenance of cooperative interaction'' \cite{Lallee2013}. Indeed, Tomasello even suggest that the principal function of language is to establish and negotiate cooperative plans \cite{tomasello2005}.
+%Considering this, we decide to use speech to verbalize the shared plan. We propose here a way to take advantage of the HTN collaborative plan structure to enhance an efficient plan verbalization\footnote{We won't discuss the issue of negotiating a plan between the involved collaborators. The human will have to follow the plan generated by the robot considered here as an expert for the tasks to perform}.
+%\footnote{Our verbalization module is able to look at object or agents during speech to give social cues and reinforce the communication, however as the multimodality is not the focus of our paper we won't give details on this aspect. Moreover, as this paper focus on efficient and socially acceptable ways to verbalize a plan, we won't discuss the issue of negotiating a plan between the involved collaborators. The human will have to follow the plan generated by the robot considered here as an expert for the tasks to perform.}.
 
-Note: our verbalization module is able to look at object or agents during speech to give social cues and reinforce the communication, however as the multimodality is not the focus of our paper we won't give details on this aspect. Moreover, as this paper focus on efficient and socially acceptable way to verbalize a plan, we won't discuss the issue of negotiating a plan between the involved collaborators. The human will have to follow the plan generated by the robot as it is here an expert for the tasks to perform.
+%TODO remove part on social cues? ^
 
-The plan verbalization will occur in two steps.
-During the first step, the robot will present the plan to the collaborators to inform them of "what" each agent should do, while in a second step, the robot will verbalize the tasks to perform during the execution to guide its partner when he learns a new task or to inform him of the current state in order to reduce collisions and error rate during the execution.
+%%Remove this?
+%The plan verbalization will occur in two steps.
+%During the first step, the robot will present the plan to the collaborators to inform them of "what" each agent should do, while in a second step, the robot will verbalize the tasks to perform during the execution to guide its partner when he learns a new task or to inform him of the current state in order to reduce collisions and error rate during the execution.
 
 
 %TODO:
@@ -341,10 +349,9 @@ During the first step, the robot will present the plan to the collaborators to i
 \subsection{Plan preprocessing}
 \label{preprocess}
 When verbalizing the plan, we need to preprocess the node list we have from the plan tree to generate a verbalization tree.
-During this operation we apply two rules.
-
-The first rule is to replace the recursive actions by their children as we believe that recursive actions are useful for planning but confusing during plan explanation. To do so, we check if the parent node has the same action name and parameters as the current one and if so, we remove the current node in the verbalizing list and replace it by its children.
-
+For that we apply two rules.
+First we replace the recursive tasks by their children as they are useful for planning but confusing during plan explanation. To do so, we check if the parent node has the same action name and parameters as the current one. If so, we remove the current node in the verbalizing list and replace it by its children.
+%
 %\begin{figure}[ht!]
 % \centering
 % \begin{tabular}{cc}
@@ -354,21 +361,22 @@ The first rule is to replace the recursive actions by their children as we belie
 % \label{fig:tree_processing}
 %   \vspace{-6pt}
 % \end{figure}
-The second rule consists in reducing the verbalization tree by using child of an action instead of the action, if the child is unique.
-
+Then, we reduce the verbalization tree by replacing tasks by their child, when the child is unique.
+%
 %These two rules are represented in the figure \ref{fig:tree_processing}, %Action2 has a unique child. In the node list to verbalize, we will therefore replace it by its child. Action1 has the same name and parameter as it's parent. It means it's a recursive action so we won't verbalize it and we will replace it by its children in the node list to verbalize.
-
-This processing is done during the verbalization, as shown in \ref{verbalizeNodes} (\textit{processNodes} function).
+%
+This preprocessing is done during the verbalization, as shown below.
+%{verbalizeNodes} (\textit{processNodes} function).
 
 
 \subsection{Verbalization}
 
-When a request is sent to the verbalization module to verbalize a tree, may it be the full plan or a sub-tree of the plan, we will call a first function to verbalize the root of this tree. As the root is the meta-task, we consider it as the goal and we will verbalize it regardless of the knowledge level of the agents.
+When a request is sent to the verbalization module to verbalize a tree, may it be the full plan or a sub-tree of the plan, we will call a first function to verbalize the root of this tree. As the root is the "highest" task, we consider it as the goal and we will directly verbalize it.
 
 So the verbalization of a plan will always start with an explanation of the goal to give the global context of the sub-tasks.
-The output sentence will look like this:
+The output sentence will be:
 Pronoun + ``have to'' + task explanation.
-The pronoun is determined according to the agents concerned. It can get the value ``I'', ``you'', ``we''.
+The pronoun is determined according to the agents concerned. It can get the value ``I'', ``you'' or ``we''.
 %or even directly the name of agent in case of multiparty interaction.
 
 Once this verbalization is done, we will look at the knowledge level of this root task to decide either to verbalize children or not.
@@ -388,46 +396,63 @@ Once this verbalization is done, we will look at the knowledge level of this roo
 
 %\end{algorithm}
 
-In case the knowledge level of involved humans is "unknown", we will verbalize the processed list of his children as explained in \ref{preprocess}.
-To express the temporal link between actions, we will verbalize differently according to the node position in the list.
-For the first node, we will begin with: \textit{``To '' + planToSpeech(parent) + Pronoun +  "will first'' + planToSpeech(currentNode)}. The second node will directly start with ``then'', and with ``finally'' for the last node.
+In case the knowledge level of involved humans is \textit{unknown}, we will verbalize the processed list of his children (using processing explained in Sect.\ref{preprocess}).
+To express the temporal link between actions, we will generate a different speech according to the node position.
+For the first node, we will give the context of the parent node: \textit{``To '' + planToSpeech(parent) + Pronoun +  "will first'' + planToSpeech(currentNode)}. For the nodes in between we will directly start with ``then'', and with ``finally'' for the last one.
 %Miki: wouldn't it be better to add some randomness to the word to make it more variable?
 %TODO: find a better example?
-As an example, if a human is not aware on how to cook an apple-pie, the system would verbalize its children as follow:
+As an example, if a human is not aware on how to cook an apple-pie, and this task is decomposed as 3 sub-tasks in the HTN, the system would verbalize its children as follow:
 "To cook an apple-pie, you will first fetch the ingredients, then you will  assemble them. Finally you will put the pie in the oven".
+This verbalization would be call recursively on each sub-task unknown in the human model.
 %Then, this kind of explanation would be repeated for each task he doesn't know in these 3 sub-tasks.
-
+%
 %This proceeding is a depth-first research of nodes to verbalize. We believe this mode facilitates understanding as we will explain from meta-tasks to lower level. However the verbalization itself is not depth-first as it is done on every siblings of the current node before going deeper in the tree. While going into detail, the user still have an understanding on the task context.
-After each node verbalization, we verify the knowledge level of the current node, and if the level is too low, we will add the children
+Indeed, after each node verbalization, if the current node concern the human, we verify his knowledge level. If the level is \textit{unknown}, we will add the children
 %COMMENT: DO WE NEED TO EXPLAIN fifO?
-to a FIFO queue to verbalize them after the current list of siblings has been verbalized as shown in \ref{verbalizeNodes}.
-This implies that if the current node is a leaf, the level of knowledge on this action won't have any effect as this node has no children. This means that human needs to have knowledge on the atomic actions of the HTN. Otherwise, this would require to have an explanation process linked to each leaf.
+to a FIFO (First In First Out) queue to verbalize them after the current list of siblings has been verbalized.
+%as shown in \ref{verbalizeNodes}.
+It implies that if the current node is a leaf, the level of knowledge on this action won't have any effect as this node has no children. Consequently the human needs to have knowledge on the atomic actions of the HTN. An other way to proceed would be to have an explanation process linked to each leaf.
+We present below the algorithm for the recursive function of node verbalization.
+\begin{program} 
+\mbox{\textbf{verbalize\_nodes algorithm:}}
+%\seq{node parent, list<node> currentNodes};
+processedNodes:=process(currentNodes);
+\FOR n:=processedNodes.start \TO processedNodes.end \STEP 1 \DO
+     verbalize(n)
+     \IF agents(n) \neq robot \AND getKnowledge(n) = "unknown"
+        \THEN queue.add(children(n)); \FI \OD
+\WHILE queue \neq \emptyset \DO 
+      verbalize\_nodes(pop(queue)); \OD
+\IF getKnowledge(parent(n)) = "unknown"
+	\THEN setKnowledge(parent(n), getAgents(parent(n)), "theoretical"); \FI
+        
+%\rcomment{This text will be set flush to the right margin}
+\end{program}
 
 One interesting aspect here is the dynamic update of the knowledge database.
-If the knowledge level of an action is unknown, after all his children nodes have been verbalized, we will set the knowledge in database from \textit{unknown} to \textit{theoretical}.
-
+%If the knowledge level of an action is unknown, after all his children nodes have been verbalized, we will set the knowledge in database from \textit{unknown} to \textit{theoretical}.
 Consequently, if an action has to be performed twice, we will explain it only once as at the second occurrence the knowledge level of the agent will be \textit{theoretical}.
 
-\begin{algorithm}[H]
-\KwData{parent node $parent$, children $list<node>$ $children$}
-$processedChildren = processNodes(parent, children)$\;
-\For{$n\leftarrow 0$ \KwTo $prossessedChildren(r)$}{
-    $verbalizeList\leftarrow n$\;
-	\If{$agents(n)!=robot AND getKnowledge(n) == "unknown"$} {
-        $add\_queue{children(n), n}$\;
-    }
-}
-\If{$getKnowledge(parent) == "unknown"$}{
-	$setKnowledge(parent, getAgents(parent), "instructed")$\;
-}
-\While{$queue != \emptyset$}{
-	$verbalize\_nodes{getFirstChildren(queue), getFirstDad(queue)}$\;
-    $pop\_front(queue)$\;
-}
+%\begin{algorithm}[H]
+%\KwData{parent node $parent$, $list<node>$ $currentNodes$}
+%$processedNodes = processNodes(parent, currentNodes)$\;
+%\For{$n\leftarrow 0$ \KwTo $processedNodes$}{
+%    $verbalizeList\leftarrow n$\;
+%	\If{$agents(n)!=robot AND getKnowledge(n) == "unknown"$} {
+%        $add\_queue(children(n), n)$\;
+%    }
+%}
+%\If{$getKnowledge(parent) == "unknown"$}{
+%	$setKnowledge(parent, getAgents(parent), "instructed")$\;
+%}
+%\While{$queue != \emptyset$}{
+%	$verbalize\_nodes{getFirstChildren(queue), getFirstDad(queue)}$\;
+%    $pop\_front(queue)$\;
+%}
 
-    \caption{$verbalize\_nodes$ \label{verbalizeNodes}}
+%    \caption{$verbalize\_nodes$ \label{verbalizeNodes}}
 
-\end{algorithm}
+%\end{algorithm}
 
 This plan verbalization allow the user to have a global view of the plan and a first explanation of the task to perform with the order.
 
@@ -445,34 +470,31 @@ This plan verbalization allow the user to have a global view of the plan and a f
 \section{Execution and Monitoring}
 \label{execution}
 
-When the plan has been verbalized to give a global picture and to instruct the human partner of the new tasks in this plan the system will start executing the shared plan, interacting and monitoring the human partner in the process.
+%When the plan has been verbalized to give a global picture and to instruct the human partner of the unknown tasks in this plan the system will start executing the shared plan, interacting and monitoring the human partner in the process.
 
 \subsection{Verbalization and Monitoring}
-During execution, the robot will signal, using speech, the start and the end of an action. As for the previous step, the level of refinement in the verbalization will depend on the knowledge level of the human partner.
+During execution, the robot will signal, using speech, the start and the end of a task. As for the previous step, the verbalization level won't be refined if the task concerns only the robot or if the level of the human partner is enough, using this time \textit{practical} as the needed level. However, as this time we only need to guide the user and not to explain, we will verbalize the lower level tasks to perform by the human and not the full hierarchy of each task.
 
 %%Miki: I think this is irrelevant since we are executing the tree, that of course is execute depth first, and verbalization is linked to execution.
 %The main difference is that we will verbalize here using depth-first. This means that if the human hasn't enough knowledge on a meta action, we will explain it before explaining its siblings.
 
 %We decide to use this different policy as the human already has a global idea of the plan, and during the execution we want him to focus on the current task.
-Once the current task to perform has been verbalized, the robot will perform it if he is the actor, or he will activate the monitoring on this action if the human is the actor. This means that the monitoring may be done on high-level tasks if the human has enough knowledge on the task.
-%%Miki: changed a little here. Thoughts?
-We chose this adaptive way of monitoring as we believe the robot would be more efficient, sparing his resources, by focusing its attention more often on parts of the plan that have never been performed by the human partner, and less when he has some form of expertise.
-To explain this further, an example will be exposed in \ref{results}.
+Once the current task to perform has been verbalized, the robot will perform it if he is the actor, or he will activate the monitoring on this task if the human is the actor. Consequently, the monitoring may be done on high-level tasks if the human has enough knowledge on it.
+We chose this adaptive way of monitoring as we believe the robot would be more efficient, sparing his resources, by focusing its attention more often on parts of the plan that have never been performed by the human partner, and less when he has some form of expertise, giving to the human more freedom on the way to execute tasks he knows.
+To explain this further, an example will be exposed in Sect.\ref{results}.
 
-Monitoring human actions is complex, particularly in high-level tasks, were we are not monitoring a set of atomic actions. The system should have reasoning models that allow the robot to understand if the state of the world is coherent with the action that the human need to perform. It should also be able to measure the level of engagement in the task of the human agent, to understand when the human is not executing his part of the shared plan, and react accordingly.
-
-We choose for this first implementation a simple strategy for monitoring. The robot will observe the environment, updating its world state accordingly, and monitor the expected consequences of actions. We will consider an action as "failed" if it hasn't been performed before a predefined amount of time. 
+Monitoring human actions is complex, particularly in high-level tasks, were we are not monitoring a set of atomic actions. The system should have reasoning models for the robot to understand if the state of the world is coherent with the action that the human needs to perform. It should also be able to measure the level of engagement in the task of the human agent, to understand when the human is not executing his part of the shared plan, and react accordingly.
+We choose for this first implementation a simple strategy for monitoring. The robot will observe the environment, updating its world state accordingly, and monitor the expected consequences of actions. We consider an action as "failed" if it hasn't been performed before a predefined amount of time.
 %%Put this in discussion section?
-We plan to extend this approach in the future, providing better mechanisms to measure the engagement of a human in a task and to understand when a monitored task has failed.
+We plan to extend this approach, providing better mechanisms to measure the engagement of a human in a task and to understand when a monitored task has failed.
 
 
 \subsection{Failure and replanning}
 
-The goal of monitoring human actions is to be able to recover from unexpected behaviors of the human. When this happens, the robot will inform the human of his wrong behavior and decrease his knowledge on the current action to "theoretical". 
+The goal of monitoring human actions is to be able to recover from unexpected behaviors of the human. When this happens, the robot will inform the human of his wrong behavior and decrease his knowledge on the current task to \textit{theoretical}. Consequently, next time the human will perform this task the robot will guide him through speech and monitor him on the children tasks.
 %maybe also the dad function to unknown to regive the context?
 The robot will also ask the task planner to compute a new plan to achieve the goal with the current updated world state.
-One of the benefit of the dynamical update of human knowledge is that this new plan may have meta-tasks that the robot already explained or that the human even performed before the failed action. In this case, informing the human of the new plan will be faster and we won't have to reexplain tasks that he already performed.
-
+One of the benefit of the dynamical update of human knowledge is that this new plan may have tasks that the robot already explained or that the human even performed before the failed action. In this case, informing the human of the new plan will be faster as we won't have to reexplain these tasks. 
 This replanning behavior give robustness to the robotic system and allow a socially acceptable recovery procedure where we inform the human error and reexplain the plan only on needed level of detail, as we took into account his knowledge improvement during the execution that failed.
 
 
@@ -589,72 +611,123 @@ This replanning behavior give robustness to the robotic system and allow a socia
 % end supervisor
 
 \section{Implementation and Results}
+\label{results}
 % To organise this part:
 % Just detail here the architecture
 % then make a very partial descritption of the experimentation
 % and give a link to a web page with full experimentation detailed.
-\subsection{Architecture}
-%Miki: Ros node his too much details imo =)
-To implement our solution, we create a module call htn-verbalizer. 
+%\subsection{Architecture}
+To implement our solution, we create a module called htn-verbalizer. 
 As all our system modules, it is controlled by the supervision.
+
 
 \begin{figure}[ht!]
 
    \vspace{-20pt}
  \centering
  \begin{tabular}{cc}
-  \includegraphics[width=0.6\textwidth]{img/archi.png}
+  \includegraphics[width=0.5\textwidth]{img/archi.jpg}
  \end{tabular}
- \caption{Architecture}
+   \vspace{-8pt}
+ \caption{System Architecture}
  \label{fig:architecture}
-   \vspace{-12pt}
+   \vspace{-20pt}
  \end{figure}
 
 The figure \ref{fig:architecture}
 sums up the architecture and interaction between modules.
 
 
-\subsection{scenario}
-To test our system we created a scenario.
-This scenario consist in a collaborative task where a human and a robot has to build a stack of three cubes together. 
-Each cube of the stack will need to be processed before being stacked.
-%mb put place and needed operation in a table?
-\begin{itemize}
-\item green cube: it will be placed in bottom and will require polishing.
-\item red cube
-\item blue cube
-\end{itemize}
-% TODO: present the scenario
-We implement in HATP the  domain of the interaction.
+%\subsection{Scenario and results}
+%Put this somewhere else?
+We describe here the interesting steps of the interaction. To have a complete description and video, visit our page\footnote{http://homepages.laas.fr/gmilliez/icsr2015/}.
 
+In the experiment we conducted, the scenario consists in a collaborative task where a human and a robot have to build a stack of three cubes collaboratively. 
+Each cube of the stack will need to be processed in a different way before being stacked.
+To simplify monitoring, we will put on tables 2dimensional areas where, when an agent puts an object, the robot will assess it is processed according to the semantic of the area. As an example, to polish a cube the human will have to put it on the polish cube area for the robot to understand his action.
 
-\subsection{Results}
-\label{results}
-We describe here the interesting steps of the interaction. To have a complete description and video, visit our page\footnote{mypage}.
+The positioning of the entities and area are represented in figure Fig.\ref{fig:scenario}.
 
+\begin{figure}[h!]
+   \vspace{-20pt}
+\label{architecture}
+  \centering
+\includegraphics[scale=0.5]{img/scenario.jpg}
+   \vspace{-8pt}
+\caption{Simulation environment for our scenario.}
+ \label{fig:scenario}
+   \vspace{-30pt}
+\end{figure}
+
+%%TODO: correct this
+When the human enters the working area, the robot will generate a collaborative plan. In this plan, the human will first take care of the green cube by smoothing it (green area), then apply glue (yellow area) and finally put it on the stack area (white area).
+After this, the robot will take care of the blue cube by cleaning it and putting it on top of the green cube.
+Finally, the human will take care of the red cube by polishing it (red area) and applying glue.
+
+We will consider two situations: first one where the robot verbalize the plan before the execution (EXPLAIN) and second one where the robot and human execute the plan. During the second part, the human will do an unexpected action(EXEC). The unexpected action will be polishing the red cube before taking care of the green cube. Even if this is not a "wrong action", this is not the execution order planed. We will also consider two type of user: a user exposed for the first time to this joint action (Na\"ive) and a second one who already successfully performed this plan (Expert).
+%
+%We will consider here different situations of our scenario. In the first one, we will interact with a na\"ive human (NA\"IVE), and show how our system is already reducing the number of nodes to verbalize, during the plan explanation (Explain) phase. Then we will show how during the execution, our monitoring system reduces the number of nodes to explain if the human makes an unexpected action (Execution).
+%Here the unexpected action will be polishing the red cube before taking care of the green cube. Even if this is not a "wrong action" Last, we will show the same run with the same user, showing how the system can avoid replans during execution. Indeed, the robot gives more flexibility to the human as he already performed this plan (EXPERT).
+%
+%TODO: describe further what happens?
+%
+%\subsection{Results}
+%\label{results}
 %\subsection{Plan verbalization}
-When a human arrives in front of the robot, toaster informs the supervisor that a human is in the working area and is looking toward the robot.
-The supervision will then send a request to the htn-verbalizer to init the interaction with the human. It will also request a plan to HATP.
+%TODO update this
+%
+To evaluate our system (KNOWLEDGE), we compare it to a basic system (BASIC) which would use the same algorithms but without plan processing and reasoning on knowledge. We represent the results in term of number of nodes verbalized in table\ref{table:perfs}.
 
-The supervisor will then require the htn-verbalizer to verbalize the plan generated from HATP. %\ref{fig:hatpplan}
+During plan explanation, in case of a na\"ive user, our system verbalizes 19 nodes of the 37 nodes in the HTN. With the basic system it verbalizes 25 nodes.
+We can explain this by the tree preprocessing that reduces the number of nodes to verbalize and by the fact that in this scenario the user has to perform twice the same task (gluing a cube). This task will be explained only once in our system.
+In the same phase, with the expert the gain is even stronger: Our system doesn't explain the plan as it was already successfully performed by the user. It will just verbalize the goal.
+
+In the execution phase, our system allows the expert to execute his task in a different way. This prevents a replan from the robot and avoids to inform of a failure because changes in the plan are allowed. Besides in the case of the na\"ive user, the robot will replan, however it won't reexplain the steps that were successfully performed by the human, explaining the nodes reduction even in with a na\"ive user.
+
+%When a human arrives in front of the robot, toaster informs the supervisor that a human is in the working area and is looking toward the robot.
+%The supervisor will then send a request to the htn-verbalizer to init the interaction with the human. It will also request a plan to HATP.
+
+%The supervisor will then require the htn-verbalizer to verbalize the plan generated from HATP. %\ref{fig:hatpplan}
 
 % Explain how an action is explained only once
-In our scenario, a method has to be done several times by the human. Indeed, the cubes need to be cleaned before being actually processed.
-As our system is able to dynamically update the human knowledge, the robot will explain it only the first time.
+%In our scenario, a method has to be done several times by the human. Indeed, the cubes need to be cleaned before being actually processed.
+%As our system is able to dynamically update the human knowledge, the robot will explain it only the first time.
 
 %\subsection{Verbalization during execution}
-Once the system finished his explanation about the plan, it informs the human that the execution will start.
+%Once the system finished his explanation about the plan, it informs the human that the execution will start.
 
 %TODO
-At action blabla, the human did balabla. The robot was monitoring the action blabla and notice that the post conditions of this action aren't reached. A new plan is then requested to HATP.
+%At action blabla, the human did balabla. The robot was monitoring the action blabla and notice that the post conditions of this action aren't reached. A new plan is then requested to HATP.
 
-The robot inform the human of his mistake and lower his practical knowledge on the concerned task.
-We show below a part of the verbalization:
+%The robot inform the human of his mistake and lower his practical knowledge on the concerned task.
+%We show below a part of the verbalization:
 %TODO
 
-Then the robot explains the new plan. In this case, he will have only to explain blabla as the other tasks were already explained in the 1st part of the execution.
+%Then the robot explains the new plan. In this case, he will have only to explain blabla as the other tasks were already explained in the 1st part of the execution.
 
-During the execution of the new plan, the robot will proceed as for the previous execution.
+%During the execution of the new plan, the robot will proceed as for the previous execution.
+%PLAN: 37 nodes, 25 verbalized by basic, 19 by our system
+
+\begin{table}
+ \vspace{-10pt}
+\centering
+\scriptsize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{c|*{3}{c|c||}*{2}{c|c|c}}
+\multicolumn{1}{c}{} & \multicolumn{2}{c}{EXPLAIN} & \multicolumn{2}{c}{EXEC} \\
+TASK & $Naïve$ & $Expert$
+	 & $Naïve$ & $Expert$  \\ 
+\hline
+ 	BASIC   & 25 & 25
+            & 32? & 32? \\
+    \hline
+   	KNOWLEDGE	& 19 & 1 
+                & 12? & 8? \\
+\end{tabular}
+\caption{System performance estimated with the number of nodes verbalized. Comparing a basic (BASIC) system with ours (KNOWLEDGE), in a situation with a na\"ive user (Na\"ive) and one who already successfully performed the task (Expert), during the first verbalization (EXPLAIN) and during an execution with the human performing an action in a different order than the one planed by the robot (EXEC).}
+ \label{table:perfs}    
+ \vspace{-20pt}
+\end{table}
 
 %TODO: End with metrics: time, number of actions verbalized
 
@@ -667,19 +740,9 @@ During the execution of the new plan, the robot will proceed as for the previous
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Is this needed? Or in conclusion?
-\section{perspective on future work}
+%\section{perspective on future work}
 
-In a future paper we would like to conduct a user study enlightening the necessity of  plan verbalization and execution segmentation according to the number of actions to verbalize for each agent to ensure scalability of our solution.
-We would like also the user to be able to make requests on actions repartition, leading to a plan negotiation before the execution.
-In the current study, we consider that the robot knows all the methods and there decomposition. A way to improve this would be to teach the decompositions of tasks to the robot as in\cite{Mohseni2015}.
-%In \cite{Mohseni2015}, the system is able to learn task decomposition from naïve user teaching. They also produce suggestion from object physical property and preconditions and postconditions comparison. This provide an easy way to teach an HTN to a system.
-To improve the interactivity, we should make possible for the human to request explanations on the robot actions as done in\cite{Lomas2012}.
-%Explaining robot actions \cite{Lomas2012}
-%https://www.researchgate.net/publication/254007903_Explaining_robot_actions
 
-%human explaining his choice
-%Telling more than we can know: Verbal reports on mental processes
-%http://people.virginia.edu/~tdw/nisbett&wilson.pdf
 
 
 \section{Conclusion}
@@ -688,6 +751,18 @@ Our approach is based on a dynamical tracking of the partner's knowledge state, 
 fasten the explanation and to avoid repetitions, thus avoiding the robot to be perceived as "annoying" and reducing the time needed to achieve the task.
 This tracking of knowledge gives the possibility for the robot to choose a plan according to a policy of teaching or efficiency. Finally it
 gives the possibility for the robot to monitor human on higher lever of actions, giving more flexibility for the human to choose the way to perform a task when he has sufficient knowledge.
+
+In our future work we would like to conduct a user study enlightening the necessity of  plan verbalization and execution segmentation according to the number of actions to verbalize for each agent to ensure scalability of our solution.
+We would like also the user to be able to make requests on actions repartition, leading to a plan negotiation before the execution.
+In the current study, we consider that the robot knows all the methods and there decomposition. A way to remove this restriction would be to teach the decomposition of tasks to the robot as in \cite{Mohseni2015}.
+%In \cite{Mohseni2015}, the system is able to learn task decomposition from naïve user teaching. They also produce suggestion from object physical property and preconditions and postconditions comparison. This provide an easy way to teach an HTN to a system.
+To improve the interactivity, we should make possible for the human to request explanations on the robot actions as done in \cite{Lomas2012}.
+%Explaining robot actions \cite{Lomas2012}
+%https://www.researchgate.net/publication/254007903_Explaining_robot_actions
+
+%human explaining his choice
+%Telling more than we can know: Verbal reports on mental processes
+%http://people.virginia.edu/~tdw/nisbett&wilson.pdf
 
 
 % ---- Bibliography ----
